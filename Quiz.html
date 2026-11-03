@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Quiz System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eaf0f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 550px;
+            background-color: white;
+            margin: 70px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px #0002;
+            text-align: center;
+        }
+
+        h1 {
+            color: #263d65;
+        }
+
+        p {
+            color: #555;
+            font-size: 17px;
+        }
+
+        button {
+            background-color: #315b91;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 7px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #203e68;
+        }
+
+        .option {
+            display: block;
+            width: 100%;
+            background-color: #edf2f8;
+            color: #263d65;
+            margin: 10px 0;
+            padding: 13px;
+            border: 1px solid #ccd8e8;
+            border-radius: 7px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .option:hover {
+            background-color: #dce8f6;
+        }
+
+        .option.selected {
+            background-color: #315b91;
+            color: white;
+        }
+
+        #quiz-box, #result-box {
+            display: none;
+        }
+
+        #question {
+            font-size: 20px;
+            font-weight: bold;
+            color: #263d65;
+            margin: 25px 0;
+        }
+
+        #progress {
+            color: #777;
+            font-size: 14px;
+        }
+
+        #score {
+            font-size: 25px;
+            color: #315b91;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- START SCREEN -->
+
+        <div id="start-box">
+
+            <h1>Online Quiz System</h1>
+
+            <p>Welcome to the Online Quiz!</p>
+
+            <p>Test your knowledge with 5 simple questions.</p>
+
+            <button onclick="startQuiz()">Start Quiz</button>
+
+        </div>
+
+
+        <!-- QUIZ SCREEN -->
+
+        <div id="quiz-box">
+
+            <h1>Online Quiz</h1>
+
+            <p id="progress"></p>
+
+            <div id="question"></div>
+
+            <div id="options"></div>
+
+            <button onclick="nextQuestion()">Next Question</button>
+
+        </div>
+
+
+        <!-- RESULT SCREEN -->
+
+        <div id="result-box">
+
+            <h1>Quiz Completed!</h1>
+
+            <p>Your Final Score:</p>
+
+            <div id="score"></div>
+
+            <p id="message"></p>
+
+            <button onclick="restartQuiz()">Restart Quiz</button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // QUIZ QUESTIONS
+
+        const questions = [
+
+            {
+                question: "What does HTML stand for?",
+                options: [
+                    "Hyper Text Markup Language",
+                    "High Text Machine Language",
+                    "Hyper Transfer Markup Language",
+                    "Home Tool Markup Language"
+                ],
+                answer: 0
+            },
+
+            {
+                question: "Which language is used for styling web pages?",
+                options: [
+                    "HTML",
+                    "CSS",
+                    "Java",
+                    "Python"
+                ],
+                answer: 1
+            },
+
+            {
+                question: "Which language makes a website interactive?",
+                options: [
+                    "CSS",
+                    "HTML",
+                    "JavaScript",
+                    "SQL"
+                ],
+                answer: 2
+            },
+
+            {
+                question: "Which tag is used to create a paragraph in HTML?",
+                options: [
+                    "<h1>",
+                    "<p>",
+                    "<br>",
+                    "<img>"
+                ],
+                answer: 1
+            },
+
+            {
+                question: "Which tag is used to create a hyperlink?",
+                options: [
+                    "<a>",
+                    "<p>",
+                    "<div>",
+                    "<table>"
+                ],
+                answer: 0
+            }
+
+        ];
+
+
+        // VARIABLES
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+
+
+        // START QUIZ FUNCTION
+
+        function startQuiz() {
+
+            currentQuestion = 0;
+            score = 0;
+
+            document.getElementById("start-box").style.display = "none";
+
+            document.getElementById("result-box").style.display = "none";
+
+            document.getElementById("quiz-box").style.display = "block";
+
+            showQuestion();
+
+        }
+
+
+        // SHOW QUESTION FUNCTION
+
+        function showQuestion() {
+
+            selectedAnswer = null;
+
+            let q = questions[currentQuestion];
+
+            document.getElementById("progress").innerText =
+                "Question " + (currentQuestion + 1) +
+                " of " + questions.length;
+
+            document.getElementById("question").innerText = q.question;
+
+            let optionsHTML = "";
+
+            q.options.forEach(function(option, index) {
+
+                optionsHTML += `
+                    <button class="option"
+                    onclick="selectAnswer(${index}, this)">
+                    ${option}
+                    </button>
+                `;
+
+            });
+
+            document.getElementById("options").innerHTML = optionsHTML;
+
+        }
+
+
+        // SELECT ANSWER FUNCTION
+
+        function selectAnswer(index, button) {
+
+            selectedAnswer = index;
+
+            let buttons = document.querySelectorAll(".option");
+
+            buttons.forEach(function(btn) {
+                btn.classList.remove("selected");
+            });
+
+            button.classList.add("selected");
+
+        }
+
+
+        // NEXT QUESTION FUNCTION
+
+        function nextQuestion() {
+
+            if (selectedAnswer === null) {
+
+                alert("Please select an answer first!");
+
+                return;
+
+            }
+
+            if (selectedAnswer === questions[currentQuestion].answer) {
+
+                score++;
+
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+
+                showQuestion();
+
+            } else {
+
+                showResult();
+
+            }
+
+        }
+
+
+        // SHOW RESULT FUNCTION
+
+        function showResult() {
+
+            document.getElementById("quiz-box").style.display = "none";
+
+            document.getElementById("result-box").style.display = "block";
+
+            document.getElementById("score").innerText =
+                score + " / " + questions.length;
+
+            if (score >= 4) {
+
+                document.getElementById("message").innerText =
+                    "Excellent! Great performance.";
+
+            } else if (score >= 2) {
+
+                document.getElementById("message").innerText =
+                    "Good effort! Keep practicing.";
+
+            } else {
+
+                document.getElementById("message").innerText =
+                    "Keep learning and try again.";
+
+            }
+
+        }
+
+
+        // RESTART QUIZ FUNCTION
+
+        function restartQuiz() {
+
+            startQuiz();
+
+        }
+
+    </script>
+
+</body>
+</html>
